@@ -1,0 +1,183 @@
+if getgenv().OldschoolAnimationsLoaded then return end
+getgenv().OldschoolAnimationsLoaded = true
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local TweenService = game:GetService("TweenService")
+local UserInputService = game:GetService("UserInputService")
+
+local lplr = Players.LocalPlayer
+repeat task.wait() until lplr.Character
+local character = lplr.Character
+
+-- ==================== ANIMAÇÕES OLDSCHOOL ====================
+local oldschool = {
+	Idle1     = "rbxassetid://5319828216",
+	Idle2     = "rbxassetid://5319831086",
+	Walk      = "rbxassetid://5319847204",
+	Run       = "rbxassetid://5319844329",
+	Fall      = "rbxassetid://5319839762",
+	Jump      = "rbxassetid://5319841935",
+	Climb     = "rbxassetid://5319816685",
+	Swim      = "rbxassetid://5319850266",
+	SwimIdle  = "rbxassetid://5319852613"
+}
+
+-- ==================== GUI ====================
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "OldschoolGUI"
+ScreenGui.Parent = game:GetService("CoreGui")
+ScreenGui.ResetOnSpawn = false
+
+local Main = Instance.new("Frame")
+Main.Name = "Main"
+Main.Parent = ScreenGui
+Main.BackgroundColor3 = Color3.fromRGB(81, 81, 81)
+Main.Position = UDim2.new(0, 20, 0, 20)
+Main.Size = UDim2.new(0, 160, 0, 120)
+Main.Active = true
+Main.Draggable = true
+
+local Title = Instance.new("TextLabel")
+Title.Parent = Main
+Title.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+Title.Size = UDim2.new(1, 0, 0, 30)
+Title.Font = Enum.Font.SourceSansBold
+Title.Text = "FE Oldschool Animations"
+Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+Title.TextSize = 14
+
+local Corner = Instance.new("UICorner")
+Corner.CornerRadius = UDim.new(0, 6)
+Corner.Parent = Main
+
+-- BOTÃO OLDSCHOOL
+local Btn = Instance.new("TextButton")
+Btn.Parent = Main
+Btn.BackgroundColor3 = Color3.fromRGB(97, 97, 97)
+Btn.Position = UDim2.new(0, 10, 0, 40)
+Btn.Size = UDim2.new(1, -20, 0, 40)
+Btn.Font = Enum.Font.SourceSansBold
+Btn.Text = "Apply Oldschool"
+Btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+Btn.TextSize = 14
+
+local BtnCorner = Instance.new("UICorner")
+BtnCorner.CornerRadius = UDim.new(0, 5)
+BtnCorner.Parent = Btn
+
+-- Função principal
+local function applyAnimations()
+	local char = lplr.Character
+	if not char then return end
+	
+	local humanoid = char:FindFirstChild("Humanoid")
+	local animate = char:FindFirstChild("Animate")
+	
+	if not humanoid or not animate then 
+		return 
+	end
+
+	-- ==============================================
+	-- 🕷️ VERIFICAÇÃO: SE FOR ARANHA/MONSTRO NÃO FAZ NADA 🕷️
+	-- ==============================================
+	local head = char:FindFirstChild("Head")
+	local torso = char:FindFirstChild("Torso") or char:FindFirstChild("UpperTorso")
+	local leftLeg = char:FindFirstChild("Left Leg") or char:FindFirstChild("LeftLowerLeg")
+	
+	if not head or not torso or not leftLeg then
+		return
+	end
+
+	-- ==============================================
+	-- 🚫 REGRA: SE FOR R6, NÃO FAZ NADA, DEIXA NORMAL 🚫
+	-- ==============================================
+	if humanoid.RigType == Enum.HumanoidRigType.R6 then
+		return
+	end
+
+	-- ==============================================
+	-- ✅ VERIFICA SE PRECISA APLICAR ✅
+	-- ==============================================
+	if animate.idle.Animation1.AnimationId == oldschool.Idle1 then
+		return
+	end
+
+	-- PARA TODAS ANIMAÇÕES ANTES DE TROCAR (EVITA BUG)
+	local animator = humanoid:FindFirstChildOfClass("Animator")
+	if animator then
+		for _, track in pairs(animator:GetPlayingAnimationTracks()) do
+			track:Stop()
+		end
+	end
+
+	animate.Enabled = false
+	task.wait(0.05)
+
+	-- COLOCA OS IDS CORRETOS PARA TODOS VEREM
+	animate.idle.Animation1.AnimationId = oldschool.Idle1
+	animate.idle.Animation2.AnimationId = oldschool.Idle2
+	animate.walk.WalkAnim.AnimationId = oldschool.Walk
+	animate.run.RunAnim.AnimationId = oldschool.Run
+	animate.fall.FallAnim.AnimationId = oldschool.Fall
+	animate.jump.JumpAnim.AnimationId = oldschool.Jump
+	animate.climb.ClimbAnim.AnimationId = oldschool.Climb
+	animate.swim.Swim.AnimationId = oldschool.Swim
+	animate.swimidle.SwimIdle.AnimationId = oldschool.SwimIdle
+
+	animate.Enabled = true
+end
+
+-- ==============================================
+	-- 🔄 LOOP PARA VOLTAR DEPOIS DA LADYBUG 🔄
+-- ==============================================
+spawn(function()
+	while wait(3) do
+		if lplr.Character then
+			applyAnimations()
+		end
+	end
+end)
+
+-- Eventos
+Btn.MouseButton1Click:Connect(applyAnimations)
+
+lplr.CharacterAdded:Connect(function(newChar)
+	character = newChar
+	task.wait(1)
+	applyAnimations()
+end)
+
+task.wait(0.5)
+applyAnimations()
+
+print("✅ Script Carregado!")
+
+-- ===== BOTÃO DE MINIMIZAR =====
+local MinimizeBtn = Instance.new("TextButton")
+MinimizeBtn.Parent = Title
+MinimizeBtn.BackgroundColor3 = Color3.fromRGB(255, 170, 0)
+MinimizeBtn.Size = UDim2.new(0, 30, 0, 30)
+MinimizeBtn.Position = UDim2.new(1, -30, 0, 0)
+MinimizeBtn.Font = Enum.Font.SourceSansBold
+MinimizeBtn.Text = "_"
+MinimizeBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+MinimizeBtn.TextSize = 18
+MinimizeBtn.ZIndex = 10
+
+local MinCorner = Instance.new("UICorner")
+MinCorner.CornerRadius = UDim.new(0, 6)
+MinCorner.Parent = MinimizeBtn
+
+local isMinimized = false
+
+MinimizeBtn.MouseButton1Click:Connect(function()
+    isMinimized = not isMinimized
+    if isMinimized then
+        Main.Size = UDim2.new(0, 160, 0, 30)
+        Btn.Visible = false
+    else
+        Main.Size = UDim2.new(0, 160, 0, 120)
+        Btn.Visible = true
+    end
+end)
