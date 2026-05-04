@@ -2,25 +2,21 @@ if getgenv().AdidasAnimationsLoaded then return end
 getgenv().AdidasAnimationsLoaded = true
 
 local Players = game:GetService("Players")
-local RunService = game:GetService("RunService")
-local TweenService = game:GetService("TweenService")
-local UserInputService = game:GetService("UserInputService")
-
 local lplr = Players.LocalPlayer
 repeat task.wait() until lplr.Character
 local character = lplr.Character
 
--- ==================== ANIMAÇÕES ADIDAS ====================
+-- ==================== ANIMAÇÕES ADIDAS (IDS NOVOS) ====================
 local adidas = {
-	Idle1     = "rbxassetid://126354114956642",
-	Idle2     = "rbxassetid://126354114956642",
-	Walk      = "rbxassetid://106810508343012",
-	Run       = "rbxassetid://124765145869332",
-	Fall      = "rbxassetid://93993406355955",
-	Jump      = "rbxassetid://115715495289805",
+	Idle1     = "rbxassetid://18537376492",
+	Idle2     = "rbxassetid://18537371272",
+	Walk      = "rbxassetid://18537392113",
+	Run       = "rbxassetid://18537384940",
+	Fall      = "rbxassetid://18537367238",
+	Jump      = "rbxassetid://18537380791",
 	Climb     = "rbxassetid://18537363391",
-	Swim      = "rbxassetid://106537993816942",
-	SwimIdle  = "rbxassetid://106537993816942"
+	Swim      = "rbxassetid://18537389531",
+	SwimIdle  = "rbxassetid://18537387180"
 }
 
 -- ==================== GUI ====================
@@ -69,6 +65,110 @@ BtnCorner.Parent = Btn
 -- Função principal
 local function applyAnimations()
 	local char = lplr.Character
+	if not char then return end
+	
+	local humanoid = char:FindFirstChild("Humanoid")
+	local animate = char:FindFirstChild("Animate")
+	
+	if not humanoid or not animate then 
+		return 
+	end
+
+	-- ==============================================
+	-- 🕷️ VERIFICAÇÃO: SE FOR ARANHA/MONSTRO NÃO FAZ NADA 🕷️
+	-- ==============================================
+	local head = char:FindFirstChild("Head")
+	local torso = char:FindFirstChild("Torso") or char:FindFirstChild("UpperTorso")
+	local leftLeg = char:FindFirstChild("Left Leg") or char:FindFirstChild("LeftLowerLeg")
+	
+	if not head or not torso or not leftLeg then
+		return
+	end
+
+	-- ==============================================
+	-- 🚫 REGRA: SE FOR R6, NÃO FAZ NADA, DEIXA NORMAL 🚫
+	-- ==============================================
+	if humanoid.RigType == Enum.HumanoidRigType.R6 then
+		return
+	end
+
+	-- ==============================================
+	-- ✅ VERIFICA SE PRECISA APLICAR ✅
+	-- ==============================================
+	if animate.idle.Animation1.AnimationId == adidas.Idle1 then
+		return
+	end
+
+	animate.Enabled = false
+	task.wait(0.05)
+
+	-- COLOCA OS IDS CORRETOS PARA TODOS VEREM
+	animate.idle.Animation1.AnimationId = adidas.Idle1
+	animate.idle.Animation2.AnimationId = adidas.Idle2
+	animate.walk.WalkAnim.AnimationId = adidas.Walk
+	animate.run.RunAnim.AnimationId = adidas.Run
+	animate.fall.FallAnim.AnimationId = adidas.Fall
+	animate.jump.JumpAnim.AnimationId = adidas.Jump
+	animate.climb.ClimbAnim.AnimationId = adidas.Climb
+	animate.swim.Swim.AnimationId = adidas.Swim
+	animate.swimidle.SwimIdle.AnimationId = adidas.SwimIdle
+
+	animate.Enabled = true
+end
+
+-- ==============================================
+	-- 🔄 LOOP PARA VOLTAR DEPOIS DA LADYBUG 🔄
+-- ==============================================
+spawn(function()
+	while wait(3) do
+		if lplr.Character then
+			applyAnimations()
+		end
+	end
+end)
+
+-- Eventos
+Btn.MouseButton1Click:Connect(applyAnimations)
+
+lplr.CharacterAdded:Connect(function(newChar)
+	character = newChar
+	task.wait(1)
+	applyAnimations()
+end)
+
+task.wait(0.5)
+applyAnimations()
+
+print("✅ Script Adidas Carregado!")
+
+-- ===== BOTÃO DE MINIMIZAR =====
+local MinimizeBtn = Instance.new("TextButton")
+MinimizeBtn.Parent = Title
+MinimizeBtn.BackgroundColor3 = Color3.fromRGB(255, 170, 0)
+MinimizeBtn.Size = UDim2.new(0, 30, 0, 30)
+MinimizeBtn.Position = UDim2.new(1, -30, 0, 0)
+MinimizeBtn.Font = Enum.Font.SourceSansBold
+MinimizeBtn.Text = "_"
+MinimizeBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+MinimizeBtn.TextSize = 18
+MinimizeBtn.ZIndex = 10
+
+local MinCorner = Instance.new("UICorner")
+MinCorner.CornerRadius = UDim.new(0, 6)
+MinCorner.Parent = MinimizeBtn
+
+local isMinimized = false
+
+MinimizeBtn.MouseButton1Click:Connect(function()
+    isMinimized = not isMinimized
+    if isMinimized then
+        Main.Size = UDim2.new(0, 160, 0, 30)
+        Btn.Visible = false
+    else
+        Main.Size = UDim2.new(0, 160, 0, 120)
+        Btn.Visible = true
+    end
+end)
 	if not char then return end
 	
 	local humanoid = char:FindFirstChild("Humanoid")
