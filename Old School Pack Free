@@ -66,17 +66,37 @@ local BtnCorner = Instance.new("UICorner")
 BtnCorner.CornerRadius = UDim.new(0, 5)
 BtnCorner.Parent = Btn
 
+-- ===== BOTÃO DE MINIMIZAR =====
+local MinimizeBtn = Instance.new("TextButton")
+MinimizeBtn.Parent = Title
+MinimizeBtn.BackgroundColor3 = Color3.fromRGB(255, 170, 0)
+MinimizeBtn.Size = UDim2.new(0, 30, 0, 30)
+MinimizeBtn.Position = UDim2.new(1, -30, 0, 0)
+MinimizeBtn.Font = Enum.Font.SourceSansBold
+MinimizeBtn.Text = "_"
+MinimizeBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+MinimizeBtn.TextSize = 18
+MinimizeBtn.ZIndex = 10
+
+local MinCorner = Instance.new("UICorner")
+MinCorner.CornerRadius = UDim.new(0, 6)
+MinCorner.Parent = MinimizeBtn
+
+-- Controle de aplicação em andamento (evita chamadas simultâneas)
+local isApplying = false
+
 -- Função principal
 local function applyAnimations()
+	-- 🔒 EVITA CHAMADAS SIMULTÂNEAS (não trava, só ignora)
+	if isApplying then return end
+
 	local char = lplr.Character
 	if not char then return end
-	
+
 	local humanoid = char:FindFirstChild("Humanoid")
 	local animate = char:FindFirstChild("Animate")
-	
-	if not humanoid or not animate then 
-		return 
-	end
+
+	if not humanoid or not animate then return end
 
 	-- ==============================================
 	-- 🕷️ VERIFICAÇÃO: SE FOR ARANHA/MONSTRO NÃO FAZ NADA 🕷️
@@ -84,24 +104,24 @@ local function applyAnimations()
 	local head = char:FindFirstChild("Head")
 	local torso = char:FindFirstChild("Torso") or char:FindFirstChild("UpperTorso")
 	local leftLeg = char:FindFirstChild("Left Leg") or char:FindFirstChild("LeftLowerLeg")
-	
-	if not head or not torso or not leftLeg then
-		return
-	end
+
+	if not head or not torso or not leftLeg then return end
 
 	-- ==============================================
 	-- 🚫 REGRA: SE FOR R6, NÃO FAZ NADA, DEIXA NORMAL 🚫
 	-- ==============================================
-	if humanoid.RigType == Enum.HumanoidRigType.R6 then
-		return
-	end
+	if humanoid.RigType == Enum.HumanoidRigType.R6 then return end
 
 	-- ==============================================
 	-- ✅ VERIFICA SE PRECISA APLICAR ✅
 	-- ==============================================
-	if animate.idle.Animation1.AnimationId == oldschool.Idle1 then
-		return
+	local idle1 = animate:FindFirstChild("idle") and animate.idle:FindFirstChild("Animation1")
+	if idle1 and idle1.AnimationId == oldschool.Idle1 then
+		return -- Já está aplicado, sai sem travar nada
 	end
+
+	-- 🔒 Marca como aplicando
+	isApplying = true
 
 	-- PARA TODAS ANIMAÇÕES ANTES DE TROCAR (EVITA BUG)
 	local animator = humanoid:FindFirstChildOfClass("Animator")
@@ -112,27 +132,31 @@ local function applyAnimations()
 	end
 
 	animate.Enabled = false
-	task.wait(0.02)
+	task.wait(0.02) -- Único yield necessário, mínimo possível
 
 	-- COLOCA OS IDS CORRETOS PARA TODOS VEREM
-	animate.idle.Animation1.AnimationId = oldschool.Idle1
-	animate.idle.Animation2.AnimationId = oldschool.Idle2
-	animate.walk.WalkAnim.AnimationId = oldschool.Walk
-	animate.run.RunAnim.AnimationId = oldschool.Run
-	animate.fall.FallAnim.AnimationId = oldschool.Fall
-	animate.jump.JumpAnim.AnimationId = oldschool.Jump
-	animate.climb.ClimbAnim.AnimationId = oldschool.Climb
-	animate.swim.Swim.AnimationId = oldschool.Swim
-	animate.swimidle.SwimIdle.AnimationId = oldschool.SwimIdle
+	animate.idle.Animation1.AnimationId     = oldschool.Idle1
+	animate.idle.Animation2.AnimationId     = oldschool.Idle2
+	animate.walk.WalkAnim.AnimationId       = oldschool.Walk
+	animate.run.RunAnim.AnimationId         = oldschool.Run
+	animate.fall.FallAnim.AnimationId       = oldschool.Fall
+	animate.jump.JumpAnim.AnimationId       = oldschool.Jump
+	animate.climb.ClimbAnim.AnimationId     = oldschool.Climb
+	animate.swim.Swim.AnimationId           = oldschool.Swim
+	animate.swimidle.SwimIdle.AnimationId   = oldschool.SwimIdle
 
 	animate.Enabled = true
+
+	-- 🔓 Libera para próxima chamada
+	isApplying = false
 end
 
 -- ==============================================
-	-- 🔄 LOOP PARA VOLTAR DEPOIS DA LADYBUG 🔄
+-- 🔄 LOOP PARA VOLTAR DEPOIS DA LADYBUG 🔄
 -- ==============================================
-spawn(function()
-	while wait(0.1) do
+task.spawn(function()
+	while true do
+		task.wait(0.011) -- 🔄 Loop rápido sem travar
 		if lplr.Character then
 			applyAnimations()
 		end
@@ -153,31 +177,16 @@ applyAnimations()
 
 print("✅ Script Carregado!")
 
--- ===== BOTÃO DE MINIMIZAR =====
-local MinimizeBtn = Instance.new("TextButton")
-MinimizeBtn.Parent = Title
-MinimizeBtn.BackgroundColor3 = Color3.fromRGB(255, 170, 0)
-MinimizeBtn.Size = UDim2.new(0, 30, 0, 30)
-MinimizeBtn.Position = UDim2.new(1, -30, 0, 0)
-MinimizeBtn.Font = Enum.Font.SourceSansBold
-MinimizeBtn.Text = "_"
-MinimizeBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-MinimizeBtn.TextSize = 18
-MinimizeBtn.ZIndex = 10
-
-local MinCorner = Instance.new("UICorner")
-MinCorner.CornerRadius = UDim.new(0, 6)
-MinCorner.Parent = MinimizeBtn
-
+-- Minimizar
 local isMinimized = false
 
 MinimizeBtn.MouseButton1Click:Connect(function()
-    isMinimized = not isMinimized
-    if isMinimized then
-        Main.Size = UDim2.new(0, 160, 0, 30)
-        Btn.Visible = false
-    else
-        Main.Size = UDim2.new(0, 160, 0, 120)
-        Btn.Visible = true
-    end
+	isMinimized = not isMinimized
+	if isMinimized then
+		Main.Size = UDim2.new(0, 160, 0, 30)
+		Btn.Visible = false
+	else
+		Main.Size = UDim2.new(0, 160, 0, 120)
+		Btn.Visible = true
+	end
 end)
