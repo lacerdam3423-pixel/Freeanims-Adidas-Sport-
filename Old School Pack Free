@@ -112,7 +112,7 @@ local function applyAnimations()
 	end
 
 	animate.Enabled = false
-	task.wait(0.05)
+	task.wait(0.02)
 
 	-- COLOCA OS IDS CORRETOS PARA TODOS VEREM
 	animate.idle.Animation1.AnimationId = oldschool.Idle1
@@ -132,7 +132,7 @@ end
 	-- 🔄 LOOP PARA VOLTAR DEPOIS DA LADYBUG 🔄
 -- ==============================================
 spawn(function()
-	while wait(3) do
+	while wait(0.1) do
 		if lplr.Character then
 			applyAnimations()
 		end
