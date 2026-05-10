@@ -2,6 +2,12 @@ if getgenv().OldschoolAnimationsLoaded then return end
 getgenv().OldschoolAnimationsLoaded = true
 
 local Players = game:GetService("Players")
+local localPlayer = Players.LocalPlayer or Players.PlayerAdded:Wait()
+
+-- Roda sem esperar o jogo inteiro
+-- seu código aqui
+
+local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
